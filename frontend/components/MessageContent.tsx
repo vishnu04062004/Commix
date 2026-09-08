@@ -1,0 +1,3 @@
+import React from 'react';
+interface Props { content: string; }
+export const MessageContent: React.FC<Props> = ({ content }) => { const parts = content.split(/(\[[^\]]+\]\([^\)]+\))/g); return <>{parts.map((part, index) => { const match = part.match(/^\[([^\]]+)\]\(([^\)]+)\)$/); if (!match) return <React.Fragment key={index}>{part.split('\n').map((line, lineIndex) => <React.Fragment key={lineIndex}>{line}{lineIndex < part.split('\n').length - 1 && <br />}</React.Fragment>)}</React.Fragment>; return <a key={index} href={match[2]} target="_blank" rel="noreferrer" style={{ color: '#6557ef', textDecoration: 'underline' }}>{match[1]}</a>; })}</>; };
