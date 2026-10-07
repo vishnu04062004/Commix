@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { API_BASE_URL } from '../services/authService.ts';
 
 const AuthCallback: React.FC = () => {
     const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
@@ -47,7 +48,7 @@ const AuthCallback: React.FC = () => {
 
                 console.log('AuthCallback: Fetching user info from /auth/me');
                 // Fetch user info
-                const response = await fetch('http://localhost:8000/auth/me', {
+                const response = await fetch(`${API_BASE_URL}/auth/me`, {
                     headers: {
                         'Authorization': `Bearer ${accessToken}`
                     }

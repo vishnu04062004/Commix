@@ -17,7 +17,8 @@ from models.user import User, UserCreate, UserUpdate
 
 
 BASE_DIR = Path(__file__).resolve().parents[1]
-_configured_database_path = Path(os.getenv("DATABASE_PATH", str(BASE_DIR / "commix.db")))
+_default_database_path = "/tmp/commix.db" if os.getenv("VERCEL") else str(BASE_DIR / "commix.db")
+_configured_database_path = Path(os.getenv("DATABASE_PATH", _default_database_path))
 DATABASE_PATH = _configured_database_path if _configured_database_path.is_absolute() else Path(__file__).resolve().parents[2] / _configured_database_path
 
 

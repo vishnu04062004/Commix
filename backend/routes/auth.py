@@ -1,5 +1,6 @@
 """Authentication endpoints for Google OAuth and local development."""
 
+import os
 from datetime import datetime
 from typing import Optional
 
@@ -14,6 +15,11 @@ from models.user import User, UserCreate
 from services.user_service import UserService
 
 router = APIRouter()
+
+
+def _frontend_url(path: str = "") -> str:
+    base_url = os.getenv("FRONTEND_URL", "http://localhost:3000").rstrip("/")
+    return f"{base_url}/{path.lstrip('/')}" if path else base_url
 
 
 class RefreshRequest(BaseModel):
@@ -41,7 +47,7 @@ async def login(request: Request, redirect_url: Optional[str] = None):
     """Start Google OAuth when configured; otherwise use the local demo path."""
     oauth_config = GoogleOAuthConfig()
     if not oauth_config.validate():
-        return RedirectResponse(url=redirect_url or "http://localhost:3000/login?demo=1")
+        return RedirectResponse(url=redirect_url or _frontend_url("login?demo=1"))
     return await get_google_oauth_client().authorize_redirect(request, oauth_config.redirect_uri)
 
 
@@ -66,10 +72,10 @@ async def callback(request: Request):
         await service.touch_login(user.user_id)
         user = await service.get_user_by_id(user.user_id) or user
         tokens = _tokens_for(user)
-        target = "http://localhost:3000/auth/callback"
+        target = _frontend_url("auth/callback")
         return RedirectResponse(url=f"{target}?access_token={tokens['access_token']}&refresh_token={tokens['refresh_token']}")
     except Exception as exc:
-        return RedirectResponse(url=f"http://localhost:3000/auth/callback?message={str(exc)}")
+        return RedirectResponse(url=f"{_frontend_url('auth/callback')}?message={str(exc)}")
 
 
 @router.post("/dev-login")
